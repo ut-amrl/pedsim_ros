@@ -226,15 +226,15 @@ void SimVisualizer::publishObstacleVisuals() {
   walls_marker.color.r = 0.647059;
   walls_marker.color.g = 0.164706;
   walls_marker.color.b = 0.164706;
-  walls_marker.scale.x = 1.0;
+  walls_marker.scale.x = 0.05;
   walls_marker.scale.y = 1.0;
   walls_marker.scale.z = 2.0;
   walls_marker.pose.position.z = walls_marker.scale.z / 2.0;
   walls_marker.pose.orientation.w = 1.0;
-  walls_marker.type = visualization_msgs::Marker::CUBE_LIST;
+  walls_marker.type = visualization_msgs::Marker::LINE_LIST;
 
   for (const auto& line : current_obstacles->obstacles) {
-    for (const auto& cell : LineObstacleToCells(line.start.x, line.start.y,
+/*    for (const auto& cell : LineObstacleToCells(line.start.x, line.start.y,
                                                 line.end.x, line.end.y)) {
       geometry_msgs::Point p;
       p.x = cell.first;
@@ -242,8 +242,17 @@ void SimVisualizer::publishObstacleVisuals() {
       p.z = 0.0;
       walls_marker.points.push_back(p);
     }
+*/
+    geometry_msgs::Point p;
+    p.x = line.start.x;
+    p.y = line.start.y;
+    p.z = 0.0;
+    walls_marker.points.push_back(p);
+    p.x = line.end.x;
+    p.y = line.end.y;
+    p.z = 0.0;
+    walls_marker.points.push_back(p);
   }
-
   pub_obstacles_visuals_.publish(walls_marker);
   q_obstacles_.pop();
 }
