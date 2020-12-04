@@ -1,28 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <scenario>
   <!--Obstacles-->
-  <obstacle x1="-0.5" y1="-0.5" x2="29.5" y2="-0.5"/>
-  <obstacle x1="-0.5" y1="-0.5" x2="-0.5" y2="14.5"/>
-  <obstacle x1="-0.5" y1="14.5" x2="29.5" y2="14.5"/>
-  <obstacle x1="29.5" y1="-0.5" x2="29.5" y2="14.5"/>
+  <obstacle x1="-0.5" y1="-0.5" x2="45" y2="-0.5"/>
+  <obstacle x1="-0.5" y1="7" x2="19" y2="7"/>
+  <obstacle x1="24" y1="7" x2="45" y2="7"/>
+  <obstacle x1="-0.5" y1="-0.5" x2="-0.5" y2="7"/>
+  <obstacle x1="45.0" y1="-0.5" x2="45.0" y2="2.0"/>
+  <obstacle x1="45.0" y1="5.0" x2="45.0" y2="7"/>
 
-  <waypoint id="east" x="5" y="5" r="2" b="1"/>
+  <waypoint id="east" x="5" y="2" r="1" b="1"/>
   <!-- Sink -->
-  <waypoint id="west" x="25" y="5" r="2" b="2"/>
+  <waypoint id="west" x="35" y="2" r="1" b="1"/>
+
+  <waypoint id="west_2" x="35" y="5" r="1" b="1"/>
+  <!-- Sink -->
+  <waypoint id="east_2" x="5" y="5" r="1" b="1"/>
 
   <waypoint id="robot_goal" x="22" y="27" r="2"/>
-  <waypoint id="robot_start" x="4" y="4" r="2"/>
+  <waypoint id="robot_start" x="15" y="5" r="2"/>
 
-
-  <agent x="4" y="4" n="1" dx="0" dy="0" type="2">
+  <agent x="15" y="5" n="1" dx="0" dy="0" type="2">
     <addwaypoint id="robot_start"/>
     <addwaypoint id="robot_goal"/>
   </agent>
 
   <!--AgentClusters-->
-  <source x="2" y="5" n="8" dx="3" dy="5" type="0">
+  <agent x="2" y="47" n="1" dx="3" dy="5" type="0">
     <addwaypoint id="east"/>
     <addwaypoint id="west"/>
-  </source>
+    <addwaypoint id="west_2"/>
+    <addwaypoint id="east_2"/>
+  </agent>
+
+  <agent x="27" y="7" n="1" dx="3" dy="5" type="0">
+    <addwaypoint id="west_2"/>
+    <addwaypoint id="east_2"/>
+    <addwaypoint id="east"/>
+    <addwaypoint id="west"/>
+  </agent>
 
 </scenario>
