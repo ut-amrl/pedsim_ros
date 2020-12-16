@@ -11,7 +11,7 @@
   <arg name="pose_initial_y" default="5.0"/>
   <arg name="pose_initial_theta" default="0.0"/>
   <arg name="simulation_factor" default="1"/>
-  <arg name="update_rate" default="25.0"/>
+  <arg name="update_rate" default="40.0"/>
   <arg name="spawn_period" default="5.0"/>
 
   <!-- main simulator node -->

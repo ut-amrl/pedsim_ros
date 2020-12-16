@@ -42,7 +42,7 @@ Ped::Tagent::Tagent() {
 
   agentRadius = 0.35;
   relaxationTime = 0.5;
-  robotPosDiffScalingFactor = 5;
+  robotPosDiffScalingFactor = 2.5;
 }
 
 /// Destructor
