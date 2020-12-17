@@ -40,7 +40,7 @@ Config::Config(QObject* parent) {
 
   forceObstacle = 5.0;
   sigmaObstacle = 0.1;
-  forceSocial = 20.0; //5.1;
+  forceSocial = 25.0; //5.1;
 
   forceGroupGaze = 3.0;
   forceGroupCoherence = 2.0;
@@ -48,8 +48,8 @@ Config::Config(QObject* parent) {
   forceRandom = 0.0; //0.1;
   forceAlongWall = 0.5; // 10.0;
 
-  cell_width = 0.05; //1.0;
-  cell_height = 0.05; // 1.0;
+  cell_width = 1.0; //1.0;
+  cell_height = 1.0; // 1.0;
 
   robot_mode = RobotMode::TELEOPERATION;
   robot_wait_time = 15;
