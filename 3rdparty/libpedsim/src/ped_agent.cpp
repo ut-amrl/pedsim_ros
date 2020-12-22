@@ -32,7 +32,7 @@ Ped::Tagent::Tagent() {
 
   // assign random maximal speed in m/s
   //normal_distribution<double> distribution(1.34, 0.26);
-  normal_distribution<double> distribution(1.0, 0.26);
+  normal_distribution<double> distribution(1.5, 0.0);
   vmax = distribution(generator);
 
   forceFactorDesired = 1.0;
@@ -40,9 +40,9 @@ Ped::Tagent::Tagent() {
   forceFactorObstacle = 10.0;
   forceSigmaObstacle = 0.8;
 
-  agentRadius = 0.6;
+  agentRadius = 1.0;
   relaxationTime = 0.5;
-  robotPosDiffScalingFactor = 2.5;
+  robotPosDiffScalingFactor = 1.0;
 }
 
 /// Destructor

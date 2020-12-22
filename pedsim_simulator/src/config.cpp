@@ -40,7 +40,7 @@ Config::Config(QObject* parent) {
 
   forceObstacle = 5.0;
   sigmaObstacle = 0.1;
-  forceSocial = 25.0; //5.1;
+  forceSocial = 30.0; //5.1;
 
   forceGroupGaze = 3.0;
   forceGroupCoherence = 2.0;
