@@ -7,7 +7,7 @@ set( MESSAGE_DEPENDENCIES
     std_msgs
 )
 
-find_package(catkin REQUIRED 
+find_package(catkin REQUIRED
   COMPONENTS
   message_generation
   ${MESSAGE_DEPENDENCIES}
@@ -20,6 +20,7 @@ link_directories(${catkin_LIBRARY_DIRS})
 # the services
 add_service_files( DIRECTORY srv
   FILES
+  StepPedsim.srv
   SetAgentState.srv
   GetAgentState.srv
   SetAllAgentsState.srv

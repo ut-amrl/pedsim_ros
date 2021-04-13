@@ -40,9 +40,9 @@ Ped::Tagent::Tagent() {
   forceFactorObstacle = 10.0;
   forceSigmaObstacle = 0.8;
 
-  agentRadius = 1.0;
+  agentRadius = 1.5;
   relaxationTime = 0.5;
-  robotPosDiffScalingFactor = 1.0;
+  robotPosDiffScalingFactor = 1.5;
 }
 
 /// Destructor

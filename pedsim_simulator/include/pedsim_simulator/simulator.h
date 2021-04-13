@@ -47,6 +47,7 @@
 #include <pedsim_msgs/LineObstacles.h>
 #include <pedsim_msgs/Waypoint.h>
 #include <pedsim_msgs/Waypoints.h>
+#include <pedsim_srvs/StepPedsim.h>
 
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -81,12 +82,15 @@ class Simulator {
   virtual ~Simulator();
   bool initializeSimulation();
   void runSimulation();
+  void step();
 
   // callbacks
   bool onPauseSimulation(std_srvs::Empty::Request& request,
                          std_srvs::Empty::Response& response);
   bool onUnpauseSimulation(std_srvs::Empty::Request& request,
                            std_srvs::Empty::Response& response);
+  bool onStep(pedsim_srvs::StepPedsim::Request& request,
+              pedsim_srvs::StepPedsim::Response& response);
 
   void spawnCallback(const ros::TimerEvent& event);
 
@@ -97,6 +101,7 @@ class Simulator {
  private:
   void updateRobotPositionFromTF();
   void publishAgents();
+  pedsim_msgs::AgentStates getAgentStates();
   void publishGroups();
   void publishObstacles();
   void publishRobotPosition();
@@ -105,6 +110,7 @@ class Simulator {
  private:
   ros::NodeHandle nh_;
   bool paused_;
+  bool step_;
   ros::Timer spawn_timer_;
 
   // publishers
@@ -117,6 +123,7 @@ class Simulator {
   // provided services
   ros::ServiceServer srv_pause_simulation_;
   ros::ServiceServer srv_unpause_simulation_;
+  ros::ServiceServer srv_step_pedsim_;
 
   // frame ids
   std::string frame_id_;

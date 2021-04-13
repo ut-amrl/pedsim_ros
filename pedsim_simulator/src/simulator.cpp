@@ -87,6 +87,9 @@ bool Simulator::initializeSimulation() {
       "pause_simulation", &Simulator::onPauseSimulation, this);
   srv_unpause_simulation_ = nh_.advertiseService(
       "unpause_simulation", &Simulator::onUnpauseSimulation, this);
+  srv_step_pedsim_ = nh_.advertiseService("StepPedsim",
+                                          &Simulator::onStep,
+                                          this);
 
   // setup TF listener and other pointers
   transform_listener_.reset(new tf::TransformListener());
@@ -125,7 +128,7 @@ bool Simulator::initializeSimulation() {
   nh_.param<double>("spawn_period", spawn_period, 5.0);
   nh_.param<std::string>("frame_id", frame_id_, "odom");
   nh_.param<std::string>("robot_base_frame_id", robot_base_frame_id_,
-      "base_footprint");
+      "robot_0/base_footprint");
 
   paused_ = false;
 
@@ -133,6 +136,17 @@ bool Simulator::initializeSimulation() {
       nh_.createTimer(ros::Duration(spawn_period), &Simulator::spawnCallback, this);
 
   return true;
+}
+
+void Simulator::step() {
+  updateRobotPositionFromTF();
+  SCENE.moveAllAgents();
+
+  publishAgents();
+  publishGroups();
+  publishRobotPosition();
+  publishObstacles();
+  publishWaypoints();
 }
 
 void Simulator::runSimulation() {
@@ -151,14 +165,7 @@ void Simulator::runSimulation() {
     }
 
     if (!paused_) {
-      updateRobotPositionFromTF();
-      SCENE.moveAllAgents();
-
-      publishAgents();
-      publishGroups();
-      publishRobotPosition();
-      publishObstacles();
-      publishWaypoints();
+      step();
     }
     ros::spinOnce();
     r.sleep();
@@ -199,6 +206,19 @@ bool Simulator::onPauseSimulation(std_srvs::Empty::Request& request,
 bool Simulator::onUnpauseSimulation(std_srvs::Empty::Request& request,
                                     std_srvs::Empty::Response& response) {
   paused_ = false;
+  return true;
+}
+
+bool Simulator::onStep(pedsim_srvs::StepPedsim::Request& request,
+                       pedsim_srvs::StepPedsim::Response& response) {
+  int steps = request.steps;
+  while (steps > 0) {
+    step();
+    steps--;
+  }
+  // Get all of the data and return it as the response
+  getAgentStates();
+  response.agent_states = getAgentStates();
   return true;
 }
 
@@ -285,6 +305,61 @@ void Simulator::publishRobotPosition() {
   robot_location.twist.twist.linear.y = robot_->getvy();
 
   pub_robot_position_.publish(robot_location);
+}
+
+pedsim_msgs::AgentStates Simulator::getAgentStates() {
+  pedsim_msgs::AgentStates all_status;
+  all_status.header = createMsgHeader();
+  auto VecToMsg = [](const Ped::Tvector& v) {
+    geometry_msgs::Vector3 gv;
+    gv.x = v.x;
+    gv.y = v.y;
+    gv.z = v.z;
+    return gv;
+  };
+
+  for (const Agent* a : SCENE.getAgents()) {
+    pedsim_msgs::AgentState state;
+    state.header = createMsgHeader();
+
+    state.id = a->getId();
+    state.type = a->getType();
+    state.pose.position.x = a->getx();
+    state.pose.position.y = a->gety();
+    state.pose.position.z = a->getz();
+    auto theta = std::atan2(a->getvy(), a->getvx());
+    state.pose.orientation = pedsim::angleToQuaternion(theta);
+
+    state.twist.linear.x = a->getvx();
+    state.twist.linear.y = a->getvy();
+    state.twist.linear.z = a->getvz();
+
+    AgentStateMachine::AgentState sc = a->getStateMachine()->getCurrentState();
+    state.social_state = agentStateToActivity(sc);
+    if (a->getType() == Ped::Tagent::ELDER) {
+      state.social_state = pedsim_msgs::AgentState::TYPE_STANDING;
+    }
+
+    // Skip robot.
+    if (a->getType() == Ped::Tagent::ROBOT) {
+      continue;
+    }
+
+    // Forces.
+    pedsim_msgs::AgentForce agent_forces;
+    agent_forces.desired_force = VecToMsg(a->getDesiredDirection());
+    agent_forces.obstacle_force = VecToMsg(a->getObstacleForce());
+    agent_forces.social_force = VecToMsg(a->getSocialForce());
+    // agent_forces.group_coherence_force = a->getSocialForce();
+    // agent_forces.group_gaze_force = a->getSocialForce();
+    // agent_forces.group_repulsion_force = a->getSocialForce();
+    // agent_forces.random_force = a->getSocialForce();
+
+    state.forces = agent_forces;
+
+    all_status.agent_states.push_back(state);
+  }
+  return all_status;
 }
 
 void Simulator::publishAgents() {
