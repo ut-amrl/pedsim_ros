@@ -68,6 +68,7 @@ class LIBEXPORT Tagent {
   double getRelaxationTime() const { return relaxationTime; };
   bool getTeleop() { return teleop; }
   double getRobotPosDiffScalingFactor() const { return robotPosDiffScalingFactor; };
+  void Reset();
 
   // these getter should replace the ones later (returning the individual vector
   // values)

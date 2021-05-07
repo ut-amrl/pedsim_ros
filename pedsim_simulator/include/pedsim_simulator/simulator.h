@@ -48,6 +48,7 @@
 #include <pedsim_msgs/Waypoint.h>
 #include <pedsim_msgs/Waypoints.h>
 #include <pedsim_srvs/StepPedsim.h>
+#include <pedsim_srvs/ResetPedsim.h>
 
 #include <geometry_msgs/Point.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -83,6 +84,7 @@ class Simulator {
   bool initializeSimulation();
   void runSimulation();
   void step();
+  bool reset(const std::string& scene_file);
 
   // callbacks
   bool onPauseSimulation(std_srvs::Empty::Request& request,
@@ -91,6 +93,8 @@ class Simulator {
                            std_srvs::Empty::Response& response);
   bool onStep(pedsim_srvs::StepPedsim::Request& request,
               pedsim_srvs::StepPedsim::Response& response);
+  bool onReset(pedsim_srvs::ResetPedsim::Request& request,
+               pedsim_srvs::ResetPedsim::Response& response);
 
   void spawnCallback(const ros::TimerEvent& event);
 
@@ -124,6 +128,7 @@ class Simulator {
   ros::ServiceServer srv_pause_simulation_;
   ros::ServiceServer srv_unpause_simulation_;
   ros::ServiceServer srv_step_pedsim_;
+  ros::ServiceServer srv_reset_pedsim_;
 
   // frame ids
   std::string frame_id_;

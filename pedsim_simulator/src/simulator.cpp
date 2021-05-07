@@ -90,6 +90,9 @@ bool Simulator::initializeSimulation() {
   srv_step_pedsim_ = nh_.advertiseService("StepPedsim",
                                           &Simulator::onStep,
                                           this);
+  srv_reset_pedsim_ = nh_.advertiseService("ResetPedsim",
+                                          &Simulator::onReset,
+                                          this);
 
   // setup TF listener and other pointers
   transform_listener_.reset(new tf::TransformListener());
@@ -126,15 +129,36 @@ bool Simulator::initializeSimulation() {
 
   double spawn_period;
   nh_.param<double>("spawn_period", spawn_period, 5.0);
-  nh_.param<std::string>("frame_id", frame_id_, "odom");
+  nh_.param<std::string>("frame_id", frame_id_, "robot0/odom");
   nh_.param<std::string>("robot_base_frame_id", robot_base_frame_id_,
-      "robot_0/base_footprint");
+      "robot0/base_footprint");
 
-  paused_ = false;
+  paused_ = true;
 
   spawn_timer_ =
       nh_.createTimer(ros::Duration(spawn_period), &Simulator::spawnCallback, this);
 
+  return true;
+}
+
+bool Simulator::reset(const std::string& scene_file) {
+  SCENE.clear();
+  // load additional parameters
+  if (scene_file == "") {
+    ROS_ERROR_STREAM("Invalid scene file: " << scene_file);
+    return false;
+  }
+  ROS_INFO_STREAM("Loading scene [" << scene_file << "] for simulation");
+
+  const QString scenefile = QString::fromStdString(scene_file);
+  ScenarioReader scenario_reader;
+  if (scenario_reader.readFromFile(scenefile) == false) {
+    ROS_ERROR_STREAM(
+        "Could not load the scene file, please check the paths and param "
+        "names : "
+        << scene_file);
+    return false;
+  }
   return true;
 }
 
@@ -151,7 +175,6 @@ void Simulator::step() {
 
 void Simulator::runSimulation() {
   ros::Rate r(CONFIG.updateRate);
-
   while (ros::ok()) {
     if (!robot_) {
       // setup the robot
@@ -166,9 +189,9 @@ void Simulator::runSimulation() {
 
     if (!paused_) {
       step();
+      r.sleep();
     }
     ros::spinOnce();
-    r.sleep();
   }
 }
 
@@ -216,6 +239,19 @@ bool Simulator::onStep(pedsim_srvs::StepPedsim::Request& request,
     step();
     steps--;
   }
+  // Get all of the data and return it as the response
+  getAgentStates();
+  response.agent_states = getAgentStates();
+  return true;
+}
+
+bool Simulator::onReset(pedsim_srvs::ResetPedsim::Request& request,
+                        pedsim_srvs::ResetPedsim::Response& response) {
+  const std::string scene_file  = request.filename;
+  // setup TF listener and other pointers
+  transform_listener_.reset(new tf::TransformListener());
+  robot_ = nullptr;
+  reset(scene_file);
   // Get all of the data and return it as the response
   getAgentStates();
   response.agent_states = getAgentStates();

@@ -40,13 +40,13 @@ Config::Config(QObject* parent) {
 
   forceObstacle = 5.0;
   sigmaObstacle = 0.1;
-  forceSocial = 30.0; //5.1;
+  forceSocial = 5.1; //5.1;
 
   forceGroupGaze = 3.0;
   forceGroupCoherence = 2.0;
   forceGroupRepulsion = 1.0;
   forceRandom = 0.0; //0.1;
-  forceAlongWall = 0.5; // 10.0;
+  forceAlongWall = 10.0; // 10.0;
 
   cell_width = 1.0; //1.0;
   cell_height = 1.0; // 1.0;

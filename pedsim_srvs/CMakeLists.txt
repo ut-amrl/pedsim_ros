@@ -20,6 +20,7 @@ link_directories(${catkin_LIBRARY_DIRS})
 # the services
 add_service_files( DIRECTORY srv
   FILES
+  ResetPedsim.srv
   StepPedsim.srv
   SetAgentState.srv
   GetAgentState.srv

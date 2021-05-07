@@ -15,10 +15,10 @@
 using namespace std;
 
 default_random_engine generator;
+static int staticid = 0;
 
 /// Default Constructor
 Ped::Tagent::Tagent() {
-  static int staticid = 0;
   id = staticid++;
   p.x = 0;
   p.y = 0;
@@ -32,7 +32,7 @@ Ped::Tagent::Tagent() {
 
   // assign random maximal speed in m/s
   //normal_distribution<double> distribution(1.34, 0.26);
-  normal_distribution<double> distribution(1.5, 0.0);
+  normal_distribution<double> distribution(1.5, 0.5);
   vmax = distribution(generator);
 
   forceFactorDesired = 1.0;
@@ -40,13 +40,19 @@ Ped::Tagent::Tagent() {
   forceFactorObstacle = 10.0;
   forceSigmaObstacle = 0.8;
 
-  agentRadius = 1.5;
+  agentRadius = 0.2;
   relaxationTime = 0.5;
   robotPosDiffScalingFactor = 1.5;
 }
 
 /// Destructor
-Ped::Tagent::~Tagent() {}
+Ped::Tagent::~Tagent() {
+  staticid = 0;
+}
+
+void Ped::Tagent::Reset() {
+  staticid = 0;
+}
 
 /// Assigns a Tscene to the agent. Tagent uses this to iterate over all
 /// obstacles and other agents in a scene.
