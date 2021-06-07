@@ -114,6 +114,7 @@ class Simulator {
  private:
   ros::NodeHandle nh_;
   bool paused_;
+  bool service_mode_;
   bool step_;
   ros::Timer spawn_timer_;
 

@@ -44,6 +44,7 @@ Simulator::Simulator(const ros::NodeHandle& node) : nh_(node) {
   dynamic_reconfigure::Server<SimConfig>::CallbackType f;
   f = boost::bind(&Simulator::reconfigureCB, this, _1, _2);
   server_.setCallback(f);
+  service_mode_ = true;
 }
 
 Simulator::~Simulator() {
@@ -175,23 +176,28 @@ void Simulator::step() {
 
 void Simulator::runSimulation() {
   ros::Rate r(CONFIG.updateRate);
-  while (ros::ok()) {
-    if (!robot_) {
-      // setup the robot
-      for (Agent* agent : SCENE.getAgents()) {
-        if (agent->getType() == Ped::Tagent::ROBOT) {
-          robot_ = agent;
-          last_robot_orientation_ =
-              poseFrom2DVelocity(robot_->getvx(), robot_->getvy());
-        }
+  if (!robot_) {
+    // setup the robot
+    for (Agent* agent : SCENE.getAgents()) {
+      if (agent->getType() == Ped::Tagent::ROBOT) {
+        robot_ = agent;
+        last_robot_orientation_ =
+          poseFrom2DVelocity(robot_->getvx(), robot_->getvy());
       }
     }
-
-    if (!paused_) {
-      step();
-      r.sleep();
+  }
+  if (service_mode_) {
+    cout << "Service Mode" << endl;
+    ros::spin();
+  } else {
+    while (ros::ok()) {
+      cout << "Pedsim Spin Once" << endl;
+      if (!paused_) {
+        step();
+        r.sleep();
+      }
+      ros::spinOnce();
     }
-    ros::spinOnce();
   }
 }
 
