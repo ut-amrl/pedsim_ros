@@ -164,6 +164,16 @@ bool Simulator::reset(const std::string& scene_file) {
 }
 
 void Simulator::step() {
+  if (!robot_) {
+    // setup the robot
+    for (Agent* agent : SCENE.getAgents()) {
+      if (agent->getType() == Ped::Tagent::ROBOT) {
+        robot_ = agent;
+        last_robot_orientation_ =
+          poseFrom2DVelocity(robot_->getvx(), robot_->getvy());
+      }
+    }
+  }
   updateRobotPositionFromTF();
   SCENE.moveAllAgents();
 
@@ -176,16 +186,6 @@ void Simulator::step() {
 
 void Simulator::runSimulation() {
   ros::Rate r(CONFIG.updateRate);
-  if (!robot_) {
-    // setup the robot
-    for (Agent* agent : SCENE.getAgents()) {
-      if (agent->getType() == Ped::Tagent::ROBOT) {
-        robot_ = agent;
-        last_robot_orientation_ =
-          poseFrom2DVelocity(robot_->getvx(), robot_->getvy());
-      }
-    }
-  }
   if (service_mode_) {
     cout << "Service Mode" << endl;
     ros::spin();
